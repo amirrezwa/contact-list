@@ -1,8 +1,12 @@
 const express = require('express');
 const swaggerJsdoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
+const validate = require('./src/middlewares/validate');
+const { createContactValidator } = require('./src/dto/createContactDto');
+const { searchContactValidator } = require('./src/dto/searchContactdto');
+const { updateContactValidator } = require('./src/dto/updateContacDto');
 const app = express();
-const port = 3000;
+const PORT = 3000;
 
 const contactController = require('./src/controllers/contactController');
 
@@ -24,12 +28,13 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 app.use(express.json());
 
-app.post('/contacts', contactController.createContact);
+app.post('/contacts',createContactValidator,validate, contactController.createContact);
 app.get('/contacts', contactController.getContacts);
-app.put('/contacts/:id', contactController.updateContact);
+app.get('/contacts/search', searchContactValidator, validate, contactController.searchContactByPhone);
+app.put('/contacts/:id', updateContactValidator, validate, contactController.updateContact);
 app.delete('/contacts/:id', contactController.deleteContact);
 
-app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
-  console.log(`Swagger docs available at http://localhost:${port}/api-docs`);
+app.listen(PORT, () => {
+  console.log(`Server running at http://localhost:${PORT}`);
+  console.log(`Swagger docs available at http://localhost:${PORT}/contact-api`);
 });

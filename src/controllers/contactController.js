@@ -1,4 +1,5 @@
 const contactService = require('../services/contactService');
+
 /**
  * @swagger
  * /contacts:
@@ -48,6 +49,39 @@ const createContact = (req, res) => {
   const getContacts = (req, res) => {
     const contacts = contactService.getContacts();
     res.status(200).json(contacts);
+  };
+  
+
+  /**
+ * @swagger
+ * /contacts/search:
+ *   get:
+ *     summary: Search contacts
+ *     description: Search contact by id or phone
+ *     parameters:
+ *       - in: query
+ *         name: phone
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Contact found
+ *       404:
+ *         description: Contact not found
+ */
+
+  const searchContact = (req, res) => {
+    const { phone } = req.query;
+  
+    const contacts = contactService.getContacts();
+  
+    const result = contacts.filter(c => c.phone === phone);
+  
+    if (!result.length) {
+      return res.status(404).send('Contact not found');
+    }
+  
+    res.status(200).json(result);
   };
   
   /**
@@ -124,5 +158,11 @@ const createContact = (req, res) => {
     res.status(204).send();
   };
   
-  module.exports = { createContact, getContacts, updateContact, deleteContact };
+  module.exports = { 
+    createContact,
+    getContacts,
+    updateContact,
+    deleteContact,
+    searchContactByPhone: searchContact
+  };
   
