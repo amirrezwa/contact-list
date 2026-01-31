@@ -1,5 +1,10 @@
+const express = require('express');
+const router = express.Router();
 const contactService = require('../services/contactService');
-
+const validate = require('../../middlewares/validate');
+const { createContactValidator } = require('../../dto/createContactDto');
+const { searchContactValidator } = require('../../dto/searchContactdto');
+const { updateContactValidator } = require('../../dto/updateContacDto');
 /**
  * @swagger
  * /contacts:
@@ -69,7 +74,7 @@ const createContact = async (req, res) => {
   
   /**
  * @swagger
- * /contacts/search:
+ * /contacts/searchByPhoneNumber:
  *   get:
  *     summary: Search contacts
  *     description: Search contact by id or phone
@@ -81,20 +86,31 @@ const createContact = async (req, res) => {
  *     responses:
  *       200:
  *         description: Contact found
+ *       
+ *       400:
+ *         description: Bad Request
+ *       
  *       404:
  *         description: Contact not found
  */
 
   const searchContact = async (req, res) => {
-    const { phone } = req.query;
-  
-    const result = await contactService.searchContact({ phone });
-  
-    if (!result.length) {
-      return res.status(404).json({ message: 'Contact not found' });
+    try {
+      const { phone } = req.query;
+    
+      const result = await contactService.searchContact({ phone });
+    
+      if (!result.length) {
+        return res.status(404).json({ message: 'Contact not found' });
+      }
+    
+      res.status(200).json(result);
+    } catch (error) {
+      res.status(500).json({
+        message: 'Failed to search contacts',
+        error: error.message,
+      });
     }
-  
-    res.status(200).json(result);
   };
   
   
@@ -178,11 +194,17 @@ const createContact = async (req, res) => {
     res.status(204).send();
   };
   
-  module.exports = { 
-    createContact,
-    getContacts,
-    updateContact,
-    deleteContact,
-    searchContactByPhone: searchContact
-  };
-  
+router.post('/', createContactValidator, validate, createContact);
+router.get('/searchByPhoneNumber', searchContactValidator, validate, searchContact);
+router.get('/', getContacts);
+router.put('/:id', updateContactValidator, validate, updateContact);
+router.delete('/:id', deleteContact);
+
+module.exports = {
+  createContact,
+  getContacts,
+  searchContactByPhone:searchContact,
+  updateContact,
+  deleteContact,
+  router,
+};
