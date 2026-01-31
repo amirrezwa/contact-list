@@ -25,16 +25,25 @@ const contactService = require('../services/contactService');
  *       400:
  *         description: Bad Request
  */
-const createContact = (req, res) => {
-    const { name, email, phone } = req.body;
-  
-    if (!name || !email || !phone) {
-      return res.status(400).send('All fields are required');
-    }
-  
-    const newContact = contactService.createContact(name, email, phone);
+const createContact = async (req, res) => {
+  const { name, email, phone } = req.body;
+
+  try {
+    const newContact = await contactService.createContact({
+      name,
+      email,
+      phone,
+    });
+
     res.status(201).json(newContact);
-  };
+  } catch (error) {
+    res.status(400).json({
+      message: 'Failed to create contact',
+      error: error.message,
+    });
+  }
+};
+
   
   /**
    * @swagger
@@ -46,12 +55,18 @@ const createContact = (req, res) => {
    *       200:
    *         description: A list of contacts
    */
-  const getContacts = (req, res) => {
-    const contacts = contactService.getContacts();
-    res.status(200).json(contacts);
+  const getContacts = async (req, res) => {
+    try {
+      const contacts = await contactService.getContacts();
+      res.status(200).json(contacts);
+    } catch (error) {
+      res.status(500).json({
+        message: 'Failed to fetch contacts',
+        error: error.message,
+      });
+    }
   };
   
-
   /**
  * @swagger
  * /contacts/search:
@@ -70,19 +85,18 @@ const createContact = (req, res) => {
  *         description: Contact not found
  */
 
-  const searchContact = (req, res) => {
+  const searchContact = async (req, res) => {
     const { phone } = req.query;
   
-    const contacts = contactService.getContacts();
-  
-    const result = contacts.filter(c => c.phone === phone);
+    const result = await contactService.searchContact({ phone });
   
     if (!result.length) {
-      return res.status(404).send('Contact not found');
+      return res.status(404).json({ message: 'Contact not found' });
     }
   
     res.status(200).json(result);
   };
+  
   
   /**
    * @swagger
@@ -116,13 +130,18 @@ const createContact = (req, res) => {
    *       404:
    *         description: Contact not found
    */
-  const updateContact = (req, res) => {
+  const updateContact = async (req, res) => {
     const { id } = req.params;
     const { name, email, phone } = req.body;
   
-    const updatedContact = contactService.updateContact(id, name, email, phone);
+    const updatedContact = await contactService.updateContact(id, {
+      name,
+      email,
+      phone,
+    });
+  
     if (!updatedContact) {
-      return res.status(404).send('Contact not found');
+      return res.status(404).json({ message: 'Contact not found' });
     }
   
     res.status(200).json(updatedContact);
@@ -147,12 +166,13 @@ const createContact = (req, res) => {
    *       404:
    *         description: Contact not found
    */
-  const deleteContact = (req, res) => {
+  const deleteContact = async (req, res) => {
     const { id } = req.params;
   
-    const deleted = contactService.deleteContact(id);
+    const deleted = await contactService.deleteContact(id);
+  
     if (!deleted) {
-      return res.status(404).send('Contact not found');
+      return res.status(404).json({ message: 'Contact not found' });
     }
   
     res.status(204).send();
