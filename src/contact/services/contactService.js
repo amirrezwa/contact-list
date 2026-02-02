@@ -1,4 +1,4 @@
-const prisma = require('../../prisma/client'); // مسیر اصلاح شد
+const prisma = require('../../prisma/client');
 
 const createContact = async ({ name, email, phone }) => {
   return prisma.contact.create({ data: { name, email, phone } });
