@@ -3,7 +3,7 @@ const express = require('express');
 const swaggerJsdoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 const authRoutes = require('./src/auth/auth.routes');
-const contactRouter = require('./src/contact/controllers/contactController');
+const contactRouter = require('./src/contact/contact.routes');
 
 const app = express();
 const PORT = 3000;
@@ -20,15 +20,15 @@ const swaggerOptions = {
     },
   },
   apis: [
-    './src/contact/controllers/contactController.js',
-    './src/auth/auth.routes.js'
+    './src/contact/contact.controller.js',
+    './src/auth/auth.routes.js',
   ],
 };
 
 const swaggerDocs = swaggerJsdoc(swaggerOptions);
 
 app.use('/auth', authRoutes);
-app.use('/contacts', contactRouter.router);
+app.use('/contacts', contactRouter);
 app.use('/contact-api', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 app.listen(PORT, () => {

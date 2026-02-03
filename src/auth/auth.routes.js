@@ -4,7 +4,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 const prisma = require('../prisma/client')
 
-const JWT_SECRET = process.env.JWT_SECRET || 'secretkey';
+const JWT_SECRET = process.env.JWT_SECRET || 'secret123';
 
 /**
  * @swagger

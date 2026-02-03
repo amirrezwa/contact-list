@@ -1,11 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const contactService = require('../services/contactService');
-const validate = require('../../middlewares/validate');
-const { createContactValidator } = require('../../dto/createContactDto');
-const { searchContactValidator } = require('../../dto/searchContactdto');
-const { updateContactValidator } = require('../../dto/updateContacDto');
-const auth = require('../../middlewares/auth.middleware');
+const contactService = require('./contact.service');
+const validate = require('../middlewares/validate');
+const { updateContactValidator,
+        searchContactValidator,
+        createContactValidator
+      } = require('../dto/index');
+const auth = require('../middlewares/auth.middleware');
 
 /**
  * @swagger
@@ -59,8 +60,6 @@ const createContact = async (req, res) => {
  * /contacts:
  *   get:
  *     summary: Get all contacts
- *     security:
- *       - BearerAuth: []
  *     responses:
  *       200:
  *         description: A list of contacts
@@ -173,7 +172,6 @@ const deleteContact = async (req, res) => {
   res.status(204).send();
 };
 
-// ✅ Protected routes with auth middleware
 router.get('/', auth, getContacts);
 router.post('/', createContactValidator, auth, validate, createContact);
 router.get('/searchByPhoneNumber', auth, searchContactValidator, validate, searchContact);
