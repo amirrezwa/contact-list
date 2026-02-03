@@ -1,11 +1,21 @@
 const prisma = require('../prisma/client');
 
-const createContact = async ({ name, email, phone }) => {
-  return prisma.contact.create({ data: { name, email, phone } });
+const createContact = async ({ name, email, phone, role = 'USER', userId }) => {
+  return prisma.contact.create({
+    data: {
+      name,
+      email,
+      phone,
+      role,
+      userId,
+    },
+  });
 };
 
-const getContacts = async () => {
-  return prisma.contact.findMany();
+const getContacts = (userId) => {
+  return prisma.contact.findMany({
+    where: { userId },
+  });
 };
 
 const searchContact = async ({ phone }) => {
@@ -33,4 +43,10 @@ const deleteContact = async (id) => {
   }
 };
 
-module.exports = { createContact, getContacts, searchContact, updateContact, deleteContact };
+module.exports = {
+  createContact,
+  getContacts,
+  searchContact,
+  updateContact,
+  deleteContact,
+};

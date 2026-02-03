@@ -1,25 +1,23 @@
 const express = require('express');
 const router = express.Router();
-
 const {
-  createContact,
-  getContacts,
-  searchContactByPhone,
-  updateContact,
-  deleteContact,
+    createContact,
+    getContacts,
+    searchContactByPhone,
+    updateContact,
+    deleteContact,
 } = require('./contact.controller');
-
-const auth = require('../middlewares/auth.middleware');
+const { checkRole, isOwnerOrAdmin, auth } = require('../middlewares/insex');
 const validate = require('../middlewares/validate');
 const { searchContactValidator,
         createContactValidator,
         updateContactValidator
     } = require('../dto/index');
 
-router.post('/', auth, createContactValidator, validate, createContact);
+router.post('/', auth, createContactValidator, checkRole('ADMIN'), validate, createContact);
 router.get('/', auth, getContacts);
-router.get('/searchByPhoneNumber', auth, searchContactValidator, validate, searchContactByPhone);
-router.put('/:id', auth, updateContactValidator, validate, updateContact);
-router.delete('/:id', auth, deleteContact);
+router.get('/searchByPhoneNumber', auth, checkRole('USER', 'ADMIN'), searchContactValidator, validate, searchContactByPhone);
+router.put('/:id', auth, isOwnerOrAdmin, checkRole('ADMIN'), updateContactValidator, validate, updateContact);
+router.delete('/:id', auth, checkRole('ADMIN'), isOwnerOrAdmin, deleteContact);
 
 module.exports = router;

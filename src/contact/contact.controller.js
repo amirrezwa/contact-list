@@ -1,12 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const contactService = require('./contact.service');
-const validate = require('../middlewares/validate');
+const {validate, auth } = require('../middlewares/insex');
 const { updateContactValidator,
         searchContactValidator,
         createContactValidator
       } = require('../dto/index');
-const auth = require('../middlewares/auth.middleware');
 
 /**
  * @swagger
@@ -22,10 +21,12 @@ const auth = require('../middlewares/auth.middleware');
  * @swagger
  * /contacts:
  *   post:
+ *     tags:
+ *       - Contacts
  *     summary: Create a new contact
  *     security:
  *       - BearerAuth: []
- *     description: Create a new contact with name, email, and phone
+ *     description: Create a new contact with name, email, phone and role
  *     requestBody:
  *       required: true
  *       content:
@@ -39,6 +40,9 @@ const auth = require('../middlewares/auth.middleware');
  *                 type: string
  *               phone:
  *                 type: string
+ *               role:
+ *                 type: string
+ *                 enum: [USER, ADMIN]
  *     responses:
  *       201:
  *         description: Contact created
@@ -46,9 +50,15 @@ const auth = require('../middlewares/auth.middleware');
  *         description: Bad Request
  */
 const createContact = async (req, res) => {
-  const { name, email, phone } = req.body;
+  const { name, email, phone, role } = req.body;
   try {
-    const newContact = await contactService.createContact({ name, email, phone });
+    const newContact = await contactService.createContact({
+      name,
+      email,
+      phone,
+      role,
+      userId: req.user.id,
+    });
     res.status(201).json(newContact);
   } catch (error) {
     res.status(400).json({ message: 'Failed to create contact', error: error.message });
@@ -60,6 +70,8 @@ const createContact = async (req, res) => {
  * /contacts:
  *   get:
  *     summary: Get all contacts
+ *     security:
+ *       - BearerAuth: []
  *     responses:
  *       200:
  *         description: A list of contacts
@@ -68,7 +80,7 @@ const createContact = async (req, res) => {
  */
 const getContacts = async (req, res) => {
   try {
-    const contacts = await contactService.getContacts();
+    const contacts = await contactService.getContacts(req.user.id);
     res.status(200).json(contacts);
   } catch (error) {
     res.status(500).json({ message: 'Failed to fetch contacts', error: error.message });

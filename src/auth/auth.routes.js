@@ -22,6 +22,7 @@ const JWT_SECRET = process.env.JWT_SECRET || 'secret123';
  *                 type: string
  *               password:
  *                 type: string
+
  *     responses:
  *       201:
  *         description: User registered
@@ -79,7 +80,7 @@ router.post('/login', async (req, res) => {
     const match = await bcrypt.compare(password, user.password);
     if (!match) return res.status(401).json({ message: 'Invalid credentials' });
     
-    const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '1h' });
+    const token = jwt.sign(  { id: user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '1h' });
     
     res.json({ token });
   } catch (error) {
