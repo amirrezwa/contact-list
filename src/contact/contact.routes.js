@@ -17,7 +17,7 @@ const { searchContactValidator,
 router.post('/', auth, createContactValidator, checkRole('ADMIN'), validate, createContact);
 router.get('/', auth, getContacts);
 router.get('/searchByPhoneNumber', auth, checkRole('USER', 'ADMIN'), searchContactValidator, validate, searchContactByPhone);
-router.put('/:id', auth, isOwnerOrAdmin, checkRole('ADMIN'), updateContactValidator, validate, updateContact);
-router.delete('/:id', auth, checkRole('ADMIN'), isOwnerOrAdmin, deleteContact);
+router.put('/:id', auth, isOwnerOrAdmin, updateContactValidator, validate, updateContact);
+router.delete('/:id', auth, isOwnerOrAdmin, deleteContact);
 
 module.exports = router;
