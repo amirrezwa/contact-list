@@ -1,8 +1,8 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const prisma = require('../prisma/client');
+const { configHelper } = require('../helpers');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'secret123';
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '1h';
 
 exports.register = async ({ email, password }) => {
@@ -35,7 +35,7 @@ exports.login = async ({ email, password }) => {
       email: user.email,
       role: user.role,
     },
-    JWT_SECRET,
+    configHelper.jwt.secrets,
     { expiresIn: JWT_EXPIRES_IN }
   );
 
