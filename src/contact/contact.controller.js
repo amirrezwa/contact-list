@@ -69,52 +69,200 @@ const createContact = async (req, res) => {
  * @swagger
  * /contacts:
  *   get:
- *     summary: Get all contacts
+ *     tags:
+ *       - Contacts
+ *     summary: Get contacts with pagination
  *     security:
  *       - BearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           example: 1
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           example: 10
+ *       - in: query
+ *         name: sortBy
+ *         schema:
+ *           type: string
+ *           example: createdAt
+ *       - in: query
+ *         name: order
+ *         schema:
+ *           type: string
+ *           enum: [asc, desc]
  *     responses:
  *       200:
- *         description: A list of contacts
+ *         description: List of contacts
  *       401:
  *         description: Unauthorized
  */
+
 const getContacts = async (req, res) => {
   try {
-    const contacts = await contactService.getContacts(req.user.id);
-    res.status(200).json(contacts);
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const sortBy = req.query.sortBy || 'createdAt';
+    const order = req.query.order === 'asc' ? 'asc' : 'desc';
+
+    const result = await contactService.getContacts({
+      user: req.user,
+      page,
+      limit,
+      sortBy,
+      order,
+    });
+
+    res.status(200).json(result);
   } catch (error) {
-    res.status(500).json({ message: 'Failed to fetch contacts', error: error.message });
+    res.status(500).json({
+      message: 'Failed to fetch contacts',
+      error: error.message,
+    });
   }
 };
+
+
+
 
 /**
  * @swagger
  * /contacts/searchByPhoneNumber:
  *   get:
- *     summary: Search contacts
+ *     tags:
+ *       - Contacts
+ *     summary: Search contacts with filters and pagination
+ *     description: |
+ *       Search contacts by phone number.
+ *       - ADMIN can search across all contacts
+ *       - USER can only search within their own contacts
  *     security:
  *       - BearerAuth: []
  *     parameters:
  *       - in: query
  *         name: phone
+ *         required: false
  *         schema:
  *           type: string
+ *         description: Phone number to search for
+ *
+ *       - in: query
+ *         name: page
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Page number
+ *
+ *       - in: query
+ *         name: limit
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         description: Number of items per page
+ *
+ *       - in: query
+ *         name: sortBy
+ *         required: false
+ *         schema:
+ *           type: string
+ *           default: createdAt
+ *         description: Field to sort by
+ *
+ *       - in: query
+ *         name: order
+ *         required: false
+ *         schema:
+ *           type: string
+ *           enum: [asc, desc]
+ *           default: desc
+ *         description: Sort order
+ *
  *     responses:
  *       200:
- *         description: Contact found
- *       400:
- *         description: Bad Request
+ *         description: Contacts found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: integer
+ *                       name:
+ *                         type: string
+ *                       email:
+ *                         type: string
+ *                         nullable: true
+ *                       phone:
+ *                         type: string
+ *                       role:
+ *                         type: string
+ *                         enum: [USER, ADMIN]
+ *                       userId:
+ *                         type: integer
+ *                       createdAt:
+ *                         type: string
+ *                         format: date-time
+ *                       updatedAt:
+ *                         type: string
+ *                         format: date-time
+ *                 meta:
+ *                   type: object
+ *                   properties:
+ *                     total:
+ *                       type: integer
+ *                     page:
+ *                       type: integer
+ *                     limit:
+ *                       type: integer
+ *                     totalPages:
+ *                       type: integer
+ *
+ *       401:
+ *         description: Unauthorized (missing or invalid token)
+ *
+ *       403:
+ *         description: Forbidden (role restriction)
+ *
  *       404:
- *         description: Contact not found
+ *         description: No contacts found
  */
+
 const searchContact = async (req, res) => {
   try {
-    const { phone } = req.query;
-    const result = await contactService.searchContact({ phone });
-    if (!result.length) return res.status(404).json({ message: 'Contact not found' });
+    const {
+      phone,
+      page = 1,
+      limit = 10,
+      sortBy = 'createdAt',
+      order = 'desc',
+    } = req.query;
+
+    const result = await contactService.searchContact({
+      phone,
+      user: req.user,
+      page: Number(page),
+      limit: Number(limit),
+      sortBy,
+      order,
+    });
+
     res.status(200).json(result);
   } catch (error) {
-    res.status(500).json({ message: 'Failed to search contacts', error: error.message });
+    res.status(500).json({
+      message: 'Failed to search contacts',
+      error: error.message,
+    });
   }
 };
 

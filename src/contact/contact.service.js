@@ -12,17 +12,78 @@ const createContact = async ({ name, email, phone, role = 'USER', userId }) => {
   });
 };
 
-const getContacts = (userId) => {
-  return prisma.contact.findMany({
-    where: { userId },
-  });
+const getContacts = async ({ user, page, limit, sortBy, order }) => {
+  const skip = (page - 1) * limit;
+
+  const whereClause =
+    user.role === 'ADMIN'
+      ? {}
+      : { userId: user.id };
+
+  const [data, total] = await Promise.all([
+    prisma.contact.findMany({
+      where: whereClause,
+      skip,
+      take: limit,
+      orderBy: {
+        [sortBy]: order,
+      },
+    }),
+    prisma.contact.count({
+      where: whereClause,
+    }),
+  ]);
+
+  return {
+    data,
+    meta: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
 };
 
-const searchContact = async ({ phone }) => {
-  return prisma.contact.findMany({
-    where: phone ? { phone } : {},
-  });
+
+const searchContact = async ({
+  phone,
+  user,
+  page,
+  limit,
+  sortBy,
+  order,
+}) => {
+  const skip = (page - 1) * limit;
+
+  const whereClause = {
+    ...(phone && { phone }),
+    ...(user.role !== 'ADMIN' && { userId: user.id }),
+  };
+
+  const [data, total] = await Promise.all([
+    prisma.contact.findMany({
+      where: whereClause,
+      skip,
+      take: limit,
+      orderBy: {
+        [sortBy]: order,
+      },
+    }),
+    prisma.contact.count({ where: whereClause }),
+  ]);
+
+  return {
+    data,
+    meta: {
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    },
+  };
 };
+
 
 const updateContact = async (id, data) => {
   try {

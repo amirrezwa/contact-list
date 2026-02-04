@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const { configHelper } = require('../helpers');
 
 const auth = (req, res, next) => {
   const authHeader = req.headers.authorization;
@@ -11,7 +12,7 @@ const auth = (req, res, next) => {
   if (!token) return res.status(401).json({ message: 'No token provided' });
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(token, configHelper.jwt.secrets);
     req.user = decoded;
     next();
   } catch (err) {

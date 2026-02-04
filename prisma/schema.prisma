@@ -37,6 +37,6 @@ model Contact {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  userId    Int       // اجباری می‌کنیم که Owner مشخص باشه
+  userId    Int       
   user      User      @relation(fields: [userId], references: [id])
 }
