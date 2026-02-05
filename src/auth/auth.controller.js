@@ -1,4 +1,5 @@
 const authService = require('./auth.service');
+const i18n = require('../../i18n');
 
 /**
  * @swagger
@@ -27,9 +28,14 @@ const authService = require('./auth.service');
 const register = async (req, res) => {
   try {
     const user = await authService.register(req.body);
-    res.status(201).json(user);
+    res.status(201).json({
+      message: i18n.__('User_Registered'),
+      user
+    });
   } catch (err) {
-    res.status(400).json({ message: err.message });
+      res.status(400).json({ 
+        message: i18n.__(err.message), 
+    });
   }
 };
 
@@ -60,9 +66,14 @@ const register = async (req, res) => {
 const login = async (req, res) => {
   try {
     const result = await authService.login(req.body);
-    res.json(result);
+    res.json({
+      message: i18n.__('Login_Successfull'),
+      result
+    });
   } catch (err) {
-    res.status(400).json({ message: err.message });
+    res.status(400).json({ 
+      message: i18n.__(err.message),
+    });
   }
 };
 

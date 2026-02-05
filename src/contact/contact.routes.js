@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+
 const {
     createContact,
     getContacts,
@@ -7,7 +8,7 @@ const {
     updateContact,
     deleteContact,
 } = require('./contact.controller');
-const { checkRole, isOwnerOrAdmin, auth } = require('../middlewares/insex');
+const { checkRole, isOwnerOrAdmin, auth } = require('../middlewares');
 const validate = require('../middlewares/validate');
 const { searchContactValidator,
         createContactValidator,

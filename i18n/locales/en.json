@@ -1,0 +1,16 @@
+{
+    "hello": "Hello, how are you?",
+    "userRegistered": "User registered successfully",
+    "loginSuccessful": "Login successful",
+    "invalidCredentials": "Invalid credentials",
+    "userAlreadyExists": "User already exists",
+    "registrationFailed": "Failed to register user",
+    "loginFailed": "Failed to login",
+    "contactCreated": "Contact {{name}} created successfully",
+    "contactUpdated": "Contact {{name}} updated successfully",
+    "contactNotFound": "Contact not found",
+    "failedToFetchContacts": "Failed to fetch contacts",
+    "failedToSearchContacts": "Failed to search contacts",
+    "failedToDeleteContact": "Failed to delete contact"
+  }
+  

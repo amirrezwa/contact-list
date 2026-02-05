@@ -1,16 +1,5 @@
 const express = require('express');
 const contactService = require('./contact.service');
-const {validate, auth } = require('../middlewares/insex');
-
-/**
- * @swagger
- * components:
- *   securitySchemes:
- *     BearerAuth:
- *       type: http
- *       scheme: bearer
- *       bearerFormat: JWT
- */
 
 /**
  * @swagger
@@ -54,10 +43,18 @@ const createContact = async (req, res) => {
       role,
       userId: req.user.id,
     });
-    res.status(201).json(newContact);
+    res.status(201).json({
+      message: res.__('Contact_Created', { name }),
+      contact: newContact,
+    });
   } catch (error) {
-    res.status(400).json({ message: 'Failed to create contact', error: error.message });
+    res.status(400).json({ 
+      message: 'Failed_To_Create_Contact', error: error.message 
+    });
   }
+  res.json({ 
+    message: res.__('Contact_Created', { name }) 
+  });
 };
 
 /**
@@ -112,10 +109,15 @@ const getContacts = async (req, res) => {
       order,
     });
 
+    if (!result.data || result.data.length === 0) {
+      return res.status(404).json({
+        message: res.__('No_Contacts_Found') 
+      });
+    }
     res.status(200).json(result);
   } catch (error) {
     res.status(500).json({
-      message: 'Failed to fetch contacts',
+      message: res.__('Failed_To_Fetch_Contacts'),
       error: error.message,
     });
   }
@@ -249,10 +251,16 @@ const searchContact = async (req, res) => {
       order,
     });
 
+    if (result.data.length === 0) {
+      return res.status(404).json({
+        message: res.__('No_Contacts_Found') 
+      });
+    }
+
     res.status(200).json(result);
   } catch (error) {
     res.status(500).json({
-      message: 'Failed to search contacts',
+      message: res.__('Failed_To_Search_Contacts'),
       error: error.message,
     });
   }
@@ -262,6 +270,8 @@ const searchContact = async (req, res) => {
  * @swagger
  * /contacts/{id}:
  *   put:
+ *     tags:
+ *       - Contacts
  *     summary: Update a contact
  *     security:
  *       - BearerAuth: []
@@ -293,15 +303,33 @@ const searchContact = async (req, res) => {
 const updateContact = async (req, res) => {
   const { id } = req.params;
   const { name, email, phone } = req.body;
+  try {
   const updatedContact = await contactService.updateContact(id, { name, email, phone });
-  if (!updatedContact) return res.status(404).json({ message: 'Contact not found' });
-  res.status(200).json(updatedContact);
+  
+  if (!updatedContact) {
+    return res.status(404).json({
+      message: res.__('Contact_Not_Found') 
+    });
+  }
+
+  res.status(200).json({
+    message: res.__('Contact_Updated', { name }),
+    contact: updatedContact,
+  });
+} catch (error) {
+  res.status(500).json({
+    message: res.__('Failed_To_Update_Contact'),
+    error: error.message,
+  });
+}
 };
 
 /**
  * @swagger
  * /contacts/{id}:
  *   delete:
+ *     tags:
+ *       - Contacts
  *     summary: Delete a contact
  *     security:
  *       - BearerAuth: []
@@ -319,9 +347,23 @@ const updateContact = async (req, res) => {
  */
 const deleteContact = async (req, res) => {
   const { id } = req.params;
-  const deleted = await contactService.deleteContact(id);
-  if (!deleted) return res.status(404).json({ message: 'Contact not found' });
-  res.status(204).send();
+
+    try {
+    const deleted = await contactService.deleteContact(id);
+    
+    if (!deleted) {
+      return res.status(404).json({ 
+        message: res.__('Contact_Not_Found') 
+      });
+    }
+
+    res.status(204).send();
+  } catch (error) {
+    res.status(500).json({
+      message: res.__('Failed_To_Delete_Contact'),
+      error: error.message,
+    });
+  }
 };
 
 

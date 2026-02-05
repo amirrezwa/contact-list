@@ -1,6 +1,8 @@
 const prisma = require('../prisma/client');
+const contactErrorMassage = require('../utils');
 
 const createContact = async ({ name, email, phone, role = 'USER', userId }) => {
+  try {
   return prisma.contact.create({
     data: {
       name,
@@ -10,6 +12,9 @@ const createContact = async ({ name, email, phone, role = 'USER', userId }) => {
       userId,
     },
   });
+} catch (error) {
+  throw new Error(contactErrorMassage.createContactFailed);
+}
 };
 
 const getContacts = async ({ user, page, limit, sortBy, order }) => {
@@ -20,6 +25,7 @@ const getContacts = async ({ user, page, limit, sortBy, order }) => {
       ? {}
       : { userId: user.id };
 
+      try {
   const [data, total] = await Promise.all([
     prisma.contact.findMany({
       where: whereClause,
@@ -43,6 +49,9 @@ const getContacts = async ({ user, page, limit, sortBy, order }) => {
       totalPages: Math.ceil(total / limit),
     },
   };
+} catch (error) {
+  throw new Error(contactErrorMassage.getContactsFailed);
+}
 };
 
 const searchContact = async ({
@@ -60,6 +69,7 @@ const searchContact = async ({
     ...(user.role !== 'ADMIN' && { userId: user.id }),
   };
 
+  try {
   const [data, total] = await Promise.all([
     prisma.contact.findMany({
       where: whereClause,
@@ -81,6 +91,9 @@ const searchContact = async ({
       totalPages: Math.ceil(total / limit),
     },
   };
+} catch (error) {
+  throw new Error(contactErrorMassage.searchContactFailed);
+}
 };
 
 const updateContact = async (id, data) => {
@@ -89,16 +102,16 @@ const updateContact = async (id, data) => {
       where: { id: Number(id) },
       data,
     });
-  } catch {
-    return null;
+  } catch (error) {
+    throw new Error(contactErrorMassage.updateContactFailed);
   }
 };
 
 const deleteContact = async (id) => {
   try {
     return await prisma.contact.delete({ where: { id: Number(id) } });
-  } catch {
-    return null;
+  } catch (error) {
+    throw new Error(contactErrorMassage.deleteContactFailed);
   }
 };
 

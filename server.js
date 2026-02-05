@@ -2,13 +2,17 @@ require('dotenv').config();
 const express = require('express');
 const swaggerJsdoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
-const authRoutes = require('./src/auth/auth.routes');
-const contactRouter = require('./src/contact/contact.routes');
+const { router: authRouter } = require('./src/auth');
+const { router: contactRouter } = require('./src/contact');
+const setLanguage = require('./src/middlewares/setLanguage');
+const i18n = require('./i18n');
 
 const app = express();
 const PORT = 3000;
 
 app.use(express.json());
+app.use(i18n.init);
+app.use(setLanguage);
 
 const swaggerOptions = {
   definition: {
@@ -21,13 +25,25 @@ const swaggerOptions = {
   },
   apis: [
     './src/contact/contact.controller.js',
-    './src/auth/auth.routes.js',
+    './src/auth/auth.controller.js',
   ],
 };
 
+
+app.use((req, res, next) => {
+  const lang = req.headers['accept-language'] || 'en';
+  i18n.setLocale(req, lang);
+  next();
+});
+
+app.get('/', (req, res) => {
+  res.send(res.__('hello'));
+});
+
+
 const swaggerDocs = swaggerJsdoc(swaggerOptions);
 
-app.use('/auth', authRoutes);
+app.use('/auth', authRouter);
 app.use('/contacts', contactRouter);
 app.use('/contact-api', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 

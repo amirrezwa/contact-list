@@ -1,0 +1,16 @@
+{
+    "hello": "سلام، خوبی؟",
+    "userRegistered": "کاربر با موفقیت ثبت شد",
+    "loginSuccessful": "ورود با موفقیت انجام شد",
+    "invalidCredentials": "اطلاعات وارد شده اشتباه است",
+    "userAlreadyExists": "کاربر قبلاً موجود است",
+    "registrationFailed": "ثبت‌نام با شکست مواجه شد",
+    "loginFailed": "ورود با شکست مواجه شد",
+    "contactCreated": "مخاطب {{name}} با موفقیت ایجاد شد",
+    "contactUpdated": "مخاطب {{name}} با موفقیت بروزرسانی شد",
+    "contactNotFound": "مخاطب یافت نشد",
+    "failedToFetchContacts": "خطا در دریافت مخاطبین",
+    "failedToSearchContacts": "خطا در جستجوی مخاطبین",
+    "failedToDeleteContact": "خطا در حذف مخاطب"
+  }
+  
