@@ -16,8 +16,6 @@ const createContactValidator = [
     .withMessage('Role must be USER or ADMIN'),
 ];
 
-
-
 module.exports = {
   createContactValidator,
 };

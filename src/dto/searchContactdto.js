@@ -1,4 +1,4 @@
-const { param, query } = require('express-validator');
+const { query } = require('express-validator');
 
 const searchContactValidator = [
     query('phone')

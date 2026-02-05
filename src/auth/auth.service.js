@@ -5,7 +5,7 @@ const { configHelper } = require('../helpers');
 
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '1h';
 
-exports.register = async ({ email, password }) => {
+const register = async ({ email, password, role = 'USER' }) => {
   const exists = await prisma.user.findUnique({ where: { email } });
   if (exists) throw new Error('User already exists');
 
@@ -15,14 +15,14 @@ exports.register = async ({ email, password }) => {
     data: {
       email,
       password: hashedPassword,
-      role: role ?? 'USER',
+      role,
     },
   });
 
   return { id: newUser.id, email: newUser.email, role: newUser.role };
 };
 
-exports.login = async ({ email, password }) => {
+const login = async ({ email, password }) => {
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user) throw new Error('Invalid credentials');
 
@@ -40,4 +40,9 @@ exports.login = async ({ email, password }) => {
   );
 
   return { token };
+};
+
+module.exports = {
+  register,
+  login,
 };

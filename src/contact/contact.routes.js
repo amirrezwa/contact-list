@@ -14,7 +14,7 @@ const { searchContactValidator,
         updateContactValidator
     } = require('../dto/index');
 
-router.post('/', auth, createContactValidator, checkRole('ADMIN'), validate, createContact);
+router.post('/', auth, createContactValidator, checkRole('USER', 'ADMIN'), validate, createContact);
 router.get('/', auth, getContacts);
 router.get('/searchByPhoneNumber', auth, checkRole('USER', 'ADMIN'), searchContactValidator, validate, searchContactByPhone);
 router.put('/:id', auth, isOwnerOrAdmin, updateContactValidator, validate, updateContact);

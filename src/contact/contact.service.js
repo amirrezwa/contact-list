@@ -45,7 +45,6 @@ const getContacts = async ({ user, page, limit, sortBy, order }) => {
   };
 };
 
-
 const searchContact = async ({
   phone,
   user,
@@ -83,7 +82,6 @@ const searchContact = async ({
     },
   };
 };
-
 
 const updateContact = async (id, data) => {
   try {

@@ -1,11 +1,6 @@
 const express = require('express');
-const router = express.Router();
 const contactService = require('./contact.service');
 const {validate, auth } = require('../middlewares/insex');
-const { updateContactValidator,
-        searchContactValidator,
-        createContactValidator
-      } = require('../dto/index');
 
 /**
  * @swagger
@@ -125,9 +120,6 @@ const getContacts = async (req, res) => {
     });
   }
 };
-
-
-
 
 /**
  * @swagger
@@ -332,11 +324,6 @@ const deleteContact = async (req, res) => {
   res.status(204).send();
 };
 
-router.get('/', auth, getContacts);
-router.post('/', createContactValidator, auth, validate, createContact);
-router.get('/searchByPhoneNumber', auth, searchContactValidator, validate, searchContact);
-router.put('/:id', auth, updateContactValidator, validate, updateContact);
-router.delete('/:id', auth, deleteContact);
 
 module.exports = {
   createContact,
@@ -344,5 +331,4 @@ module.exports = {
   searchContactByPhone: searchContact,
   updateContact,
   deleteContact,
-  router,
 };
