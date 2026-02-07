@@ -13,6 +13,11 @@ const auth = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, configHelper.jwt.secrets);
+    
+    if (decoded.type === 'refresh') {
+      return res.status(401).json({ message: 'Invalid token type. Use access token.' });
+    }
+    
     req.user = decoded;
     next();
   } catch (err) {

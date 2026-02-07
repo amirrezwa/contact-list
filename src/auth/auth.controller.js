@@ -77,7 +77,73 @@ const login = async (req, res) => {
   }
 };
 
+/**
+ * @swagger
+ * /auth/refresh:
+ *   post:
+ *     tags:
+ *       - Auth
+ *     summary: Refresh access token
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               refreshToken:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: New access token generated
+ *       401:
+ *         description: Invalid or expired refresh token
+ */
+const refresh = async (req, res) => {
+  try {
+    const result = await authService.refreshToken(req.body);
+    res.json({
+      message: i18n.__('Token_Refreshed'),
+      result
+    });
+  } catch (err) {
+    res.status(401).json({ 
+      message: i18n.__(err.message),
+    });
+  }
+};
+
+/**
+ * @swagger
+ * /auth/logout:
+ *   post:
+ *     tags:
+ *       - Auth
+ *     summary: Logout user
+ *     security:
+ *       - BearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Logged out successfully
+ *       401:
+ *         description: Unauthorized
+ */
+const logout = async (req, res) => {
+  try {
+    await authService.logout(req.user.id);
+    res.json({
+      message: i18n.__('Logout_Successfull'),
+    });
+  } catch (err) {
+    res.status(400).json({ 
+      message: i18n.__(err.message),
+    });
+  }
+};
+
 module.exports = {
   register,
   login,
+  refresh,
+  logout,
 };

@@ -22,13 +22,29 @@ const swaggerOptions = {
       version: '1.0.0',
       description: 'A simple Express API for managing contacts',
     },
+
+    components: {
+      securitySchemes: {
+        BearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+        },
+      },
+    },
+
+    security: [
+      {
+        BearerAuth: [],
+      },
+    ],
   },
+
   apis: [
     './src/contact/contact.controller.js',
     './src/auth/auth.controller.js',
   ],
 };
-
 
 app.use((req, res, next) => {
   const lang = req.headers['accept-language'] || 'en';
@@ -39,7 +55,6 @@ app.use((req, res, next) => {
 app.get('/', (req, res) => {
   res.send(res.__('hello'));
 });
-
 
 const swaggerDocs = swaggerJsdoc(swaggerOptions);
 
