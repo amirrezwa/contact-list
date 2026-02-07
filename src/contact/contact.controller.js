@@ -44,7 +44,7 @@ const createContact = async (req, res) => {
       userId: req.user.id,
     });
     res.status(201).json({
-      message: res.__('Contact_Created', { name }),
+      message: i18n.__('Contact_Created', { name }),
       contact: newContact,
     });
   } catch (error) {
@@ -53,7 +53,7 @@ const createContact = async (req, res) => {
     });
   }
   res.json({ 
-    message: res.__('Contact_Created', { name }) 
+    message: i18n.__('Contact_Created', { name }) 
   });
 };
 
@@ -111,13 +111,13 @@ const getContacts = async (req, res) => {
 
     if (!result.data || result.data.length === 0) {
       return res.status(404).json({
-        message: res.__('No_Contacts_Found') 
+        message: i18n.__('No_Contacts_Found') 
       });
     }
     res.status(200).json(result);
   } catch (error) {
     res.status(500).json({
-      message: res.__('Failed_To_Fetch_Contacts'),
+      message: i18n.__('Failed_To_Fetch_Contacts'),
       error: error.message,
     });
   }
@@ -253,14 +253,14 @@ const searchContact = async (req, res) => {
 
     if (result.data.length === 0) {
       return res.status(404).json({
-        message: res.__('No_Contacts_Found') 
+        message: i18n.__('No_Contacts_Found') 
       });
     }
 
     res.status(200).json(result);
   } catch (error) {
     res.status(500).json({
-      message: res.__('Failed_To_Search_Contacts'),
+      message: i18n.__('Failed_To_Search_Contacts'),
       error: error.message,
     });
   }
@@ -308,17 +308,17 @@ const updateContact = async (req, res) => {
   
   if (!updatedContact) {
     return res.status(404).json({
-      message: res.__('Contact_Not_Found') 
+      message: i18n.__('Contact_Not_Found') 
     });
   }
 
   res.status(200).json({
-    message: res.__('Contact_Updated', { name }),
+    message: i18n.__('Contact_Updated', { name }),
     contact: updatedContact,
   });
 } catch (error) {
   res.status(500).json({
-    message: res.__('Failed_To_Update_Contact'),
+    message: i18n.__('Failed_To_Update_Contact'),
     error: error.message,
   });
 }
@@ -353,14 +353,14 @@ const deleteContact = async (req, res) => {
     
     if (!deleted) {
       return res.status(404).json({ 
-        message: res.__('Contact_Not_Found') 
+        message: i18n.__('Contact_Not_Found') 
       });
     }
 
     res.status(204).send();
   } catch (error) {
     res.status(500).json({
-      message: res.__('Failed_To_Delete_Contact'),
+      message: i18n.__('Failed_To_Delete_Contact'),
       error: error.message,
     });
   }

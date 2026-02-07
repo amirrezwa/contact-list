@@ -120,22 +120,52 @@ const refresh = async (req, res) => {
  *     tags:
  *       - Auth
  *     summary: Logout user
+ *     description: Logs out the user and removes the refresh token from the database.
  *     security:
  *       - BearerAuth: []
  *     responses:
  *       200:
- *         description: Logged out successfully
+ *         description: Logout successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Logout successful"
+ *       400:
+ *         description: Bad Request - Token not valid or missing
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "No token provided"
  *       401:
- *         description: Unauthorized
+ *         description: Unauthorized - Invalid or expired token
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Unauthorized"
  */
+
 const logout = async (req, res) => {
   try {
-    await authService.logout(req.user.id);
+    console.log('Logging out user', req.user.id); 
+    await authService.logout(req.user.id);  
     res.json({
       message: i18n.__('Logout_Successfull'),
     });
   } catch (err) {
-    res.status(400).json({ 
+    console.error('Logout error:', err.message);  
+    res.status(400).json({
       message: i18n.__(err.message),
     });
   }
